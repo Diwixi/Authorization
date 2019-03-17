@@ -1,0 +1,154 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    def version_major = Integer.parseInt(version_major)
+    def version_minor = Integer.parseInt(version_minor)
+    def version_patch = Integer.parseInt(version_patch)
+    def version_build = Integer.parseInt(version_build)
+
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        applicationId "com.diwixis.mangareader"
+        minSdkVersion 24
+        targetSdkVersion 28
+        multiDexEnabled true
+
+        versionCode version_major * 10000 + version_minor * 1000 + version_patch * 100 + version_build
+        versionName "${version_major}.${version_minor}.${version_patch}"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            def userLogin = getStringFromProperty("local.properties", "project.userLogin") ?: ""
+            def userPassword = getStringFromProperty("local.properties", "project.userPassword") ?: ""
+            def clientId = getStringFromProperty("local.properties", "project.clientId") ?: ""
+            def clientSecret = getStringFromProperty("local.properties", "project.clientSecret") ?: ""
+
+            debuggable true //дебаг
+            minifyEnabled false //удаление неиспользуемого кода
+            shrinkResources false //удаление неиспользованных ресурсов
+            buildConfigField "String", "API_BASE_URL", '"https://kitsu.io/api/"'
+            buildConfigField "String", "DEV_USER_LOGIN", "\"$userLogin\""
+            buildConfigField "String", "DEV_USER_PASSWORD", "\"$userPassword\""
+            buildConfigField "String", "CLIENT_ID", "\"$clientId\""
+            buildConfigField "String", "CLIENT_SECRET", "\"$clientSecret\""
+        }
+        release {
+            def clientId = getStringFromProperty("local.properties", "project.clientId") ?: ""
+            def clientSecret = getStringFromProperty("local.properties", "project.clientSecret") ?: ""
+
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "API_BASE_URL", '"https://kitsu.io/api/"'
+            buildConfigField "String", "DEV_USER_LOGIN", '"'
+            buildConfigField "String", "DEV_USER_PASSWORD", '""'
+            buildConfigField "String", "CLIENT_ID", "\"$clientId\""
+            buildConfigField "String", "CLIENT_SECRET", "\"$clientSecret\""
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dexOptions {
+        preDexLibraries true
+        maxProcessCount 4
+        javaMaxHeapSize "8g"
+        jumboMode = true
+    }
+
+    lintOptions {
+        abortOnError true
+        checkReleaseBuilds true
+        noLines true
+        xmlReport false
+    }
+
+    androidExtensions { experimental = true }
+
+    applicationVariants.all { variant ->
+        def flavor = variant.productFlavors[0]
+        def buildType = variant.buildType
+
+        File outDir = file("${rootDir}/out/${buildType.name}")
+        File mappingOutDir = file("${outDir}/mapping")
+        if (!outDir.exists()) {
+            outDir.mkdirs()
+        }
+        if (!mappingOutDir.exists()) {
+            mappingOutDir.mkdirs()
+        }
+        variant.assemble.doLast {
+            variant.outputs.each { output ->
+                copy {
+                    from output.outputFile
+                    into outDir
+                    rename { fileName -> "MangaReader-v${variant.versionName}.apk" }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:multidex:1.0.3'
+
+    // RETROFIT
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.5.0'
+
+    // RX
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.6'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.3.0'
+
+    // DAGGER
+    api 'com.google.dagger:dagger:2.21'
+    implementation 'com.google.dagger:dagger-android:2.21'
+    implementation 'com.google.dagger:dagger-android-support:2.21'
+    kapt 'com.google.dagger:dagger-compiler:2.21'
+    kapt 'com.google.dagger:dagger-android-processor:2.21'
+
+    // GLIDE
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'com.github.bumptech.glide:annotations:4.9.0'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.9.0'
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'
+
+    // LOGGER
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    //JSON
+    api 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8'
+
+    //ANDROIDX
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.annotation:annotation:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.0.0'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.0.0'
+    implementation 'androidx.room:room-runtime:2.0.0'
+    kapt 'androidx.lifecycle:lifecycle-compiler:2.0.0'
+    kapt 'androidx.room:room-compiler:2.0.0'
+
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.21"
+    testImplementation 'junit:junit:4.12'
+}
+
+kapt { generateStubs = true }
