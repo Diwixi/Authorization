@@ -1,5 +1,6 @@
 package com.diwixis.mangareader.domain.usecase
 
+import com.diwixis.mangareader.domain.model.network.AuthToken
 import io.reactivex.Completable
 
 /**
@@ -15,10 +16,10 @@ interface AuthUseCase {
      * @param login Логин пользователя.
      * @param password Пароль пользователя.
      */
-    fun signIn(login: String, password: String): Completable
+    suspend fun signIn(login: String, password: String): AuthToken
 
     /** Выйти из системы */
-    fun logOut()
+    suspend fun logOut()
 
     /** Авторизован ли пользователь */
     fun isLoggedIn(): Boolean

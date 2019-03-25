@@ -3,7 +3,6 @@ package com.diwixis.mangareader.data.remote.api
 import com.diwixis.mangareader.BuildConfig
 import com.diwixis.mangareader.data.remote.AuthService
 import com.diwixis.mangareader.domain.model.network.AuthToken
-import io.reactivex.Single
 
 /**
  *
@@ -11,10 +10,10 @@ import io.reactivex.Single
  * @author П. Густокашин (Diwixis)
  */
 class AuthApi(private val service: AuthService) {
-    fun getAuthToken(
+    suspend fun getAuthToken(
         userName: String,
         userPass: String
-    ): Single<AuthToken> {
+    ): AuthToken {
         return service.getAuthToken(
             userName,
             userPass,
@@ -24,9 +23,9 @@ class AuthApi(private val service: AuthService) {
         )
     }
 
-    fun refreshAuthToken(
+    suspend fun refreshAuthToken(
         refreshToken: String
-    ): Single<AuthToken> {
+    ): AuthToken {
         return service.refreshAuthToken(
             refreshToken,
             GRANT_TYPE_REFRESH,

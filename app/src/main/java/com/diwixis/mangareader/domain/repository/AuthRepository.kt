@@ -1,6 +1,6 @@
 package com.diwixis.mangareader.domain.repository
 
-import io.reactivex.Completable
+import com.diwixis.mangareader.domain.model.network.AuthToken
 
 /**
  * Репозиторий авторизации.
@@ -15,5 +15,5 @@ interface AuthRepository {
      * @param login Логин пользователя.
      * @param password Пароль пользователя.
      */
-    fun getAuthToken(login: String, password: String): Completable
+    suspend fun getAuthToken(login: String, password: String): AuthToken
 }

@@ -12,7 +12,9 @@ import com.diwixis.mangareader.utils.SchedulerFacade
 import com.diwixis.mangareader.utils.extensions.loginIsValid
 import com.diwixis.mangareader.utils.extensions.passwordIsValid
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -47,15 +49,19 @@ class AuthorizationViewModel @Inject constructor(
 
     fun login(login: String, pass: String) {
         if (checkFields(login, pass)) {
-            authUseCase.signIn(login = login, password = pass)
-                .subscribeOn(scheduler.io)
-                .observeOn(scheduler.ui)
-                .doOnSubscribe { _authLiveData.value = Response.loading() }
-                .subscribe(
-                    { _authLiveData.value = Response.success(value = Unit) },
-                    { _authLiveData.value = Response.failure(error = it) }
-                ).addTo(rxDisposables)
+            GlobalScope.launch(Dispatchers.IO) {
+                try {
+                    authUseCase.signIn(login = login, password = pass)
+                    _authLiveData.value = Response.success(value = Unit)
+                } catch (e: ApiException) {
+                    _authLiveData.value = Response.failure(error = e)
+                }
+            }
         }
+    }
+
+    fun someActor() = actor<Any>(CommonPool) {
+
     }
 
     private fun validation(login: String, pass: String): AuthException? {

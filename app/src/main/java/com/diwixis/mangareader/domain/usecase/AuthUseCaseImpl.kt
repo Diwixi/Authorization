@@ -1,6 +1,7 @@
 package com.diwixis.mangareader.domain.usecase
 
 import com.diwixis.mangareader.data.remote.AuthDataFactory
+import com.diwixis.mangareader.domain.model.network.AuthToken
 import com.diwixis.mangareader.domain.repository.AuthRepository
 import io.reactivex.Completable
 
@@ -14,11 +15,11 @@ class AuthUseCaseImpl(
     private val authDataFactory: AuthDataFactory
 ) : AuthUseCase {
 
-    override fun signIn(login: String, password: String): Completable {
+    override suspend fun signIn(login: String, password: String): AuthToken {
         return auth.getAuthToken(login, password)
     }
 
-    override fun logOut() {
+    override suspend fun logOut() {
         authDataFactory.clear()
     }
 
