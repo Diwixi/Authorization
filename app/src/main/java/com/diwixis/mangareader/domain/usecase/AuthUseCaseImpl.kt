@@ -3,7 +3,6 @@ package com.diwixis.mangareader.domain.usecase
 import com.diwixis.mangareader.data.remote.AuthDataFactory
 import com.diwixis.mangareader.domain.model.network.AuthToken
 import com.diwixis.mangareader.domain.repository.AuthRepository
-import io.reactivex.Completable
 
 /**
  * Реализация [AuthUseCase]

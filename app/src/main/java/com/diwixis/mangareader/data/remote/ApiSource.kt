@@ -1,9 +1,10 @@
 package com.diwixis.mangareader.data.remote
 
 import com.diwixis.mangareader.data.remote.api.AuthApi
-import com.diwixis.mangareader.presentation.screens.MainActivity.Companion.launch
-import io.reactivex.Single
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 
 /**
  * Источник данных API.

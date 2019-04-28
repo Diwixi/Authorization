@@ -1,7 +1,6 @@
 package com.diwixis.mangareader.domain.usecase
 
 import com.diwixis.mangareader.domain.model.network.AuthToken
-import io.reactivex.Completable
 
 /**
  * Use Case авторизации.

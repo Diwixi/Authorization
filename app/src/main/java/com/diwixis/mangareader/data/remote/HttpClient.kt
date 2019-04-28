@@ -2,6 +2,7 @@ package com.diwixis.mangareader.data.remote
 
 import android.content.Context
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -40,7 +41,7 @@ class HttpClient(
     private fun configRetrofit(context: Context?, baseUrl: String): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addCallAdapterFactory(RxErrorHandlingAdapterFactory())
+            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(JacksonConverterFactory.create(jacksonObjectMapper()))
             .client(configHttpClient(context))
             .build()

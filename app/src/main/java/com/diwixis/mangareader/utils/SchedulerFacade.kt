@@ -1,8 +1,5 @@
 package com.diwixis.mangareader.utils
 
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
-
 /**
  *
  *

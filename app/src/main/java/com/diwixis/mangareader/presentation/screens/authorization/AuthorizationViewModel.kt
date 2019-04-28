@@ -11,7 +11,6 @@ import com.diwixis.mangareader.presentation.common.Response
 import com.diwixis.mangareader.utils.SchedulerFacade
 import com.diwixis.mangareader.utils.extensions.loginIsValid
 import com.diwixis.mangareader.utils.extensions.passwordIsValid
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,18 +26,12 @@ class AuthorizationViewModel @Inject constructor(
     private val scheduler: SchedulerFacade
 ) : ViewModel() {
     private val _authLiveData = MutableLiveData<Response<Unit>>()
-    private val rxDisposables = CompositeDisposable()
 
     val authLiveData: LiveData<Response<Unit>>
         get() = _authLiveData
 
     val isLoggedIn: Boolean
         get() = authUseCase.isLoggedIn()
-
-    override fun onCleared() {
-        super.onCleared()
-        rxDisposables.dispose()
-    }
 
     private fun checkFields(login: String, pass: String): Boolean {
         return validation(login, pass)?.let {
@@ -58,10 +51,6 @@ class AuthorizationViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun someActor() = actor<Any>(CommonPool) {
-
     }
 
     private fun validation(login: String, pass: String): AuthException? {
