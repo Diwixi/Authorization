@@ -3,28 +3,30 @@ package com.diwixis.mangareader.presentation.screens.authorization
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.diwixis.mangareader.WorkerManager
 import com.diwixis.mangareader.data.exception.ApiException
 import com.diwixis.mangareader.data.exception.AuthException
 import com.diwixis.mangareader.data.exception.AuthExceptionMsg
 import com.diwixis.mangareader.domain.usecase.AuthUseCase
 import com.diwixis.mangareader.presentation.common.Response
-import com.diwixis.mangareader.utils.SchedulerFacade
 import com.diwixis.mangareader.utils.extensions.loginIsValid
 import com.diwixis.mangareader.utils.extensions.passwordIsValid
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.koin.core.parameter.parametersOf
 
 /**
  * Модель авторизации
  *
  * @author П. Густокашин (Diwixis)
  */
-class AuthorizationViewModel @Inject constructor(
-    private val authUseCase: AuthUseCase,
-    private val scheduler: SchedulerFacade
-) : ViewModel() {
+@ExperimentalCoroutinesApi
+class AuthorizationViewModel constructor(
+    private val authUseCase: AuthUseCase
+) : ViewModel(), KoinComponent {
+    private val worker: WorkerManager by inject { parametersOf(this::class.simpleName) }
     private val _authLiveData = MutableLiveData<Response<Unit>>()
 
     val authLiveData: LiveData<Response<Unit>>
@@ -33,7 +35,7 @@ class AuthorizationViewModel @Inject constructor(
     val isLoggedIn: Boolean
         get() = authUseCase.isLoggedIn()
 
-    private fun checkFields(login: String, pass: String): Boolean {
+    private fun isValidFields(login: String, pass: String): Boolean {
         return validation(login, pass)?.let {
             _authLiveData.value = Response.failure(it)
             false
@@ -41,14 +43,14 @@ class AuthorizationViewModel @Inject constructor(
     }
 
     fun login(login: String, pass: String) {
-        if (checkFields(login, pass)) {
-            GlobalScope.launch(Dispatchers.IO) {
-                try {
-                    authUseCase.signIn(login = login, password = pass)
-                    _authLiveData.value = Response.success(value = Unit)
-                } catch (e: ApiException) {
-                    _authLiveData.value = Response.failure(error = e)
-                }
+        if (!isValidFields(login, pass)) return
+
+        worker.main.launch {
+            try {
+                authUseCase.signIn(login = login, password = pass)
+                _authLiveData.value = Response.success(value = Unit)
+            } catch (e: ApiException) {
+                _authLiveData.value = Response.failure(error = e)
             }
         }
     }
@@ -72,5 +74,10 @@ class AuthorizationViewModel @Inject constructor(
             }
             else -> return null
         }
+    }
+
+    override fun onCleared() {
+        worker.cancel()
+        super.onCleared()
     }
 }

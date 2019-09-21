@@ -3,19 +3,15 @@ package com.diwixis.mangareader.presentation.screens.authorization
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.diwixis.mangareader.BuildConfig
 import com.diwixis.mangareader.R
 import com.diwixis.mangareader.data.exception.ApiException
 import com.diwixis.mangareader.presentation.common.Failure
-import com.diwixis.mangareader.presentation.common.Progress
 import com.diwixis.mangareader.presentation.common.Response
 import com.diwixis.mangareader.presentation.common.Success
 import com.diwixis.mangareader.presentation.screens.MainActivity
-import com.diwixis.mangareader.utils.extensions.injectViewModel
-import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_authorization.*
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  *
@@ -24,17 +20,13 @@ import javax.inject.Inject
  */
 class AuthorizationActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: AuthorizationViewModel
+    private val viewModel by viewModel<AuthorizationViewModel>()
     private lateinit var viewHolder: AuthorizationViewHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authorization)
 
-        viewModel = injectViewModel(viewModelFactory)
         with(viewModel) {
             observeAuthorization()
             if (isLoggedIn) openMain("Is Logged In")
@@ -52,7 +44,6 @@ class AuthorizationActivity : AppCompatActivity() {
     private fun AuthorizationViewModel.observeAuthorization() {
         val observer = Observer<Response<Unit>> { response ->
             when (response) {
-                is Progress -> viewHolder.authIsProgressIndicatorVisible = true
                 is Success -> openMain(response.value.toString())
                 is Failure -> with(viewHolder) {
                     authIsProgressIndicatorVisible = false
