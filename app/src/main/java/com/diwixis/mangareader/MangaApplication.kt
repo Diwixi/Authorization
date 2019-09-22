@@ -16,7 +16,7 @@ class MangaApplication : Application() {
 
         startKoin {
             androidContext(this@MangaApplication)
-            modules(listOf(modules, viewModels))
+            modules(listOf(modules, viewModels, authModule, networkModule))
         }
     }
 

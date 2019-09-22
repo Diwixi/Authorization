@@ -1,10 +1,7 @@
 package com.diwixis.mangareader.data.remote
 
 import com.diwixis.mangareader.domain.model.network.AuthToken
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.Headers
-import retrofit2.http.POST
+import retrofit2.http.*
 
 /**
  * Интерфейс для получения авторизац
@@ -12,13 +9,12 @@ import retrofit2.http.POST
  * @author П. Густокашин (Diwixis)
  */
 interface AuthService {
-
     /**
      * Получить токен доступа.
      */
-    @POST("oauth/token")
-    @Headers("Content-Type: application/x-www-form-urlencoded")
     @FormUrlEncoded
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @POST("oauth/token")
     suspend fun getAuthToken(
         @Field("username") username: String,
         @Field("password") password: String,
@@ -27,9 +23,9 @@ interface AuthService {
         @Field("client_secret") clientSecret: String
     ): AuthToken
 
-    @POST("oauth/token")
-    @Headers("Content-Type: application/x-www-form-urlencoded")
     @FormUrlEncoded
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @POST("oauth/token")
     suspend fun refreshAuthToken(
         @Field("refresh_token") refreshToken: String,
         @Field("grant_type") grantType: String,

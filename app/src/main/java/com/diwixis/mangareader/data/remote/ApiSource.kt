@@ -5,6 +5,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.koin.core.parameter.parametersOf
 
 /**
  * Источник данных API.
@@ -12,9 +15,10 @@ import kotlinx.coroutines.async
  *
  * @author П. Густокашин (Diwixis)
  */
-class ApiSource(client: HttpClientFactory, authDataFactory: AuthDataFactory) {
+class ApiSource(client: HttpClientFactory, authDataFactory: AuthDataFactory) : KoinComponent {
 
     private val onTokenSupplier: () -> String = { authDataFactory.token }
+    val authApi: AuthApi by inject { parametersOf(client.create(AuthService::class)) }
 
     private val onNewTokenSupplier: () -> Deferred<String> = {
         CoroutineScope(Dispatchers.Main).async {
@@ -22,6 +26,4 @@ class ApiSource(client: HttpClientFactory, authDataFactory: AuthDataFactory) {
             authDataFactory.update(token = token)
         }
     }
-
-    val authApi by lazy { AuthApi(client.create(AuthService::class)) }
 }

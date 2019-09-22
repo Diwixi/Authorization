@@ -15,6 +15,7 @@ class AuthRepositoryImpl(
     private val authDataFactory: AuthDataFactory
 ) : AuthRepository {
     override suspend fun getAuthToken(login: String, password: String): AuthToken {
-        return api.authApi.getAuthToken(login, password).apply { authDataFactory.update(login, this) }
+        return api.authApi.getAuthToken(login, password)
+            .apply { authDataFactory.update(login, this) }
     }
 }

@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.activity_authorization.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
- *
+ * Экран авторизации.
  *
  * @author П. Густокашин (Diwixis)
  */

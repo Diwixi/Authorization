@@ -9,7 +9,7 @@ import org.koin.core.get
  *
  * @author П. Густокашин (Diwixis)
  */
-class WorkerManager(val name: String) : KoinComponent {
+class WorkerManager(name: String) : KoinComponent {
     private val job = SupervisorJob()
     val main = MainScope() + CoroutineName(name)
     val backgroundScope = CoroutineScope(get<CoroutineDispatcher>() + job)

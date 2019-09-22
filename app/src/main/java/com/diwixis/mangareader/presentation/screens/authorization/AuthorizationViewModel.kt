@@ -47,6 +47,7 @@ class AuthorizationViewModel constructor(
 
         worker.main.launch {
             try {
+                //проблема в ретрофите getAuthToken(Unknown Source) No Retrofit annotation found. (parameter #6)
                 authUseCase.signIn(login = login, password = pass)
                 _authLiveData.value = Response.success(value = Unit)
             } catch (e: ApiException) {
