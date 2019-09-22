@@ -14,8 +14,8 @@ class AuthUseCaseImpl(
     private val authDataFactory: AuthDataFactory
 ) : AuthUseCase {
 
-    override suspend fun signIn(login: String, password: String): AuthToken {
-        return auth.getAuthToken(login, password)
+    override suspend fun signIn(login: String, password: String) {
+        auth.getAuthToken(login, password)
     }
 
     override suspend fun logOut() {

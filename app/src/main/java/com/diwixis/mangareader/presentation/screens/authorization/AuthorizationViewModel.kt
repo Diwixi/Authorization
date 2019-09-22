@@ -13,9 +13,11 @@ import com.diwixis.mangareader.utils.extensions.loginIsValid
 import com.diwixis.mangareader.utils.extensions.passwordIsValid
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.koin.core.parameter.parametersOf
+import java.lang.IllegalArgumentException
 
 /**
  * Модель авторизации
@@ -48,10 +50,12 @@ class AuthorizationViewModel constructor(
         worker.main.launch {
             try {
                 //проблема в ретрофите getAuthToken(Unknown Source) No Retrofit annotation found. (parameter #6)
-                authUseCase.signIn(login = login, password = pass)
+                withContext(worker.bg) { authUseCase.signIn(login = login, password = pass) }
                 _authLiveData.value = Response.success(value = Unit)
             } catch (e: ApiException) {
                 _authLiveData.value = Response.failure(error = e)
+            } catch (e: IllegalArgumentException) {
+                e.toString()
             }
         }
     }

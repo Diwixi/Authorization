@@ -15,7 +15,7 @@ interface AuthUseCase {
      * @param login Логин пользователя.
      * @param password Пароль пользователя.
      */
-    suspend fun signIn(login: String, password: String): AuthToken
+    suspend fun signIn(login: String, password: String)
 
     /** Выйти из системы */
     suspend fun logOut()

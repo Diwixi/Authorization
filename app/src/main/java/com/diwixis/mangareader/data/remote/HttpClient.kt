@@ -1,8 +1,9 @@
 package com.diwixis.mangareader.data.remote
 
 import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -18,14 +19,15 @@ import java.util.concurrent.TimeUnit
  * @author П. Густокашин (Diwixis)
  */
 class HttpClient(
-    context: Context,
+    private val context: Context,
     baseUrl: String,
     private val isDebugging: Boolean = false
 ) {
-    val retrofit by lazy { configRetrofit(context, baseUrl) }
+    val retrofit by lazy { configRetrofit(baseUrl) }
 
-    private fun configHttpClient(context: Context?): OkHttpClient {
+    private fun configHttpClient(): OkHttpClient {
         val okHttpClientBuilder = OkHttpClient.Builder()
+            .addInterceptor(ChuckerInterceptor(context))
             .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .readTimeout(TIMEOUT_READ_SECONDS, TimeUnit.SECONDS)
             .writeTimeout(TIMEOUT_WRITE_SECONDS, TimeUnit.SECONDS)
@@ -38,12 +40,12 @@ class HttpClient(
         return okHttpClientBuilder.build()
     }
 
-    private fun configRetrofit(context: Context?, baseUrl: String): Retrofit {
+    private fun configRetrofit(baseUrl: String): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(JacksonConverterFactory.create(jacksonObjectMapper()))
-            .client(configHttpClient(context))
+            .client(configHttpClient())
             .build()
     }
 
