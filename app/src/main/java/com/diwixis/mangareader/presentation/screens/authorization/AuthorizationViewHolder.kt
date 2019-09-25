@@ -22,8 +22,6 @@ class AuthorizationViewHolder(private val rootView: View) {
         get() = rootView.authProgress.visibility == View.VISIBLE
         set(value) {
             rootView.authProgress.visibility = if (value) View.VISIBLE else View.GONE
-            if (value) rootView.authProgress.bringToFront()
-            rootView.loginButton.isEnabled = !value
         }
 
     var onClickLogin: Action? = null

@@ -7,6 +7,7 @@ import com.diwixis.mangareader.BuildConfig
 import com.diwixis.mangareader.R
 import com.diwixis.mangareader.data.exception.ApiException
 import com.diwixis.mangareader.presentation.common.Failure
+import com.diwixis.mangareader.presentation.common.Progress
 import com.diwixis.mangareader.presentation.common.Response
 import com.diwixis.mangareader.presentation.common.Success
 import com.diwixis.mangareader.presentation.screens.MainActivity
@@ -44,16 +45,13 @@ class AuthorizationActivity : AppCompatActivity() {
     private fun AuthorizationViewModel.observeAuthorization() {
         val observer = Observer<Response<Unit>> { response ->
             when (response) {
+                is Progress -> viewHolder.authIsProgressIndicatorVisible = true
                 is Success -> openMain(response.value.toString())
                 is Failure -> with(viewHolder) {
-                    authIsProgressIndicatorVisible = false
+                    viewHolder.authIsProgressIndicatorVisible = false
                     when (response.error) {
-                        is ApiException -> {
-                            showError(response.error.errorWrapper?.error?.text)
-                        }
-                        else -> {
-                            showError(response.error.message)
-                        }
+                        is ApiException -> showError(response.error.errorWrapper?.error?.text)
+                        else -> showError(response.error.message)
                     }
                 }
             }

@@ -1,9 +1,6 @@
 package com.diwixis.mangareader.presentation.screens.authorization
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.diwixis.mangareader.WorkerManager
+import androidx.lifecycle.*
 import com.diwixis.mangareader.data.exception.ApiException
 import com.diwixis.mangareader.data.exception.AuthException
 import com.diwixis.mangareader.data.exception.AuthExceptionMsg
@@ -11,13 +8,11 @@ import com.diwixis.mangareader.domain.usecase.AuthUseCase
 import com.diwixis.mangareader.presentation.common.Response
 import com.diwixis.mangareader.utils.extensions.loginIsValid
 import com.diwixis.mangareader.utils.extensions.passwordIsValid
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
-import org.koin.core.inject
-import org.koin.core.parameter.parametersOf
-import java.lang.IllegalArgumentException
 
 /**
  * Модель авторизации
@@ -28,9 +23,7 @@ import java.lang.IllegalArgumentException
 class AuthorizationViewModel constructor(
     private val authUseCase: AuthUseCase
 ) : ViewModel(), KoinComponent {
-    private val worker: WorkerManager by inject { parametersOf(this::class.simpleName) }
     private val _authLiveData = MutableLiveData<Response<Unit>>()
-
     val authLiveData: LiveData<Response<Unit>>
         get() = _authLiveData
 
@@ -47,15 +40,15 @@ class AuthorizationViewModel constructor(
     fun login(login: String, pass: String) {
         if (!isValidFields(login, pass)) return
 
-        worker.main.launch {
-            try {
-                //проблема в ретрофите getAuthToken(Unknown Source) No Retrofit annotation found. (parameter #6)
-                withContext(worker.bg) { authUseCase.signIn(login = login, password = pass) }
-                _authLiveData.value = Response.success(value = Unit)
+        viewModelScope.launch {
+            _authLiveData.value = Response.loading()
+            _authLiveData.value = try {
+                withContext(Dispatchers.IO) { authUseCase.signIn(login = login, password = pass) }
+                Response.success(value = Unit)
             } catch (e: ApiException) {
-                _authLiveData.value = Response.failure(error = e)
+                Response.failure(error = e)
             } catch (e: IllegalArgumentException) {
-                e.toString()
+                Response.failure(error = AuthException(ApiException(AuthExceptionMsg.UNKNOWN_ERROR.msg)))
             }
         }
     }
@@ -79,10 +72,5 @@ class AuthorizationViewModel constructor(
             }
             else -> return null
         }
-    }
-
-    override fun onCleared() {
-        worker.cancel()
-        super.onCleared()
     }
 }

@@ -134,6 +134,11 @@ dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.10.0.pr3'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.10.0.pr3'
 
+    //LIFECYCLE
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-alpha04'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-alpha04'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-alpha04'
+
     //ANDROIDX
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.annotation:annotation:1.1.0'

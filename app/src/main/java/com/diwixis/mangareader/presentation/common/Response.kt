@@ -12,8 +12,12 @@ sealed class Response<out T> {
 
         /** Ошибка. */
         fun <T> failure(error: Throwable) = Failure<T>(error)
+
+        /** В процессе выполнения. */
+        fun <T> loading() = Progress<T>()
     }
 }
 
 data class Success<out T>(val value: T) : Response<T>()
 data class Failure<out T>(val error: Throwable) : Response<T>()
+class Progress<out T> : Response<T>()

@@ -20,7 +20,6 @@ import org.koin.dsl.module
 val modules = module {
     single { Dispatchers.IO }
     single { Preferences(get()) }
-    factory { (name: String) -> WorkerManager(name) }
 }
 
 val authModule = module {

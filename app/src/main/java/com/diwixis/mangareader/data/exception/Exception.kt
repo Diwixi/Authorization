@@ -16,6 +16,7 @@ open class ApiException(
     override val cause: Throwable? = null,
     val errorWrapper: ErrorWrapper? = null
 ) : RuntimeException() {
+
     constructor(exception: ApiException) : this(
         message = exception.message,
         cause = exception.cause,
@@ -57,14 +58,14 @@ enum class AuthExceptionMsg(val msg: String) {
     ALL_IS_EMPTY("All fields is empty"),
     LOGIN_IS_EMPTY("Login is empty"),
     PASS_IS_EMPTY("Pass is empty"),
-    SHOP_IS_EMPTY("Shop is empty"),
     LOGIN_IS_NOT_VALID("Login is not valid"),
     PASS_IS_NOT_VALID("Pass is not valid"),
+    UNKNOWN_ERROR("Unknown error"),
     OK("OK");
 
     companion object {
         fun fromString(msg: String?): AuthExceptionMsg? {
-            for (value in AuthExceptionMsg.values()) {
+            for (value in values()) {
                 if (value.msg == msg) {
                     return value
                 }
