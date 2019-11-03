@@ -4,6 +4,7 @@ import android.view.View
 import com.diwixis.mangareader.utils.Action
 import com.diwixis.mangareader.utils.extensions.visible
 import kotlinx.android.synthetic.main.activity_authorization.view.*
+import com.diwixis.mangareader.BuildConfig
 
 /**
  * Холдер авторизации.
@@ -36,15 +37,10 @@ class AuthorizationViewHolder(private val rootView: View) {
     fun setup(init: AuthorizationViewHolder.() -> Unit): AuthorizationViewHolder {
         init()
         with(rootView) {
+            authLoginEditText.setText(if (BuildConfig.DEBUG) BuildConfig.DEV_USER_LOGIN else "")
+            authPassEditText.setText(if (BuildConfig.DEBUG) BuildConfig.DEV_USER_PASSWORD else "")
             loginButton.setOnClickListener { onClickLogin?.invoke() }
         }
         return this
-    }
-
-    fun bind(login: String, password: String) {
-        with(rootView) {
-            authLoginEditText.setText(login)
-            authPassEditText.setText(password)
-        }
     }
 }

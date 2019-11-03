@@ -26,7 +26,7 @@ open class ApiException(
 
 class AuthException(exception: ApiException) : ApiException(exception) {
     companion object {
-        fun checkFields(login: String, pass: String): Response<AuthToken>? {
+        fun checkFields(login: String, pass: String): Response<AuthException>? {
             when {
                 (login.isEmpty() && pass.isEmpty()) -> {
                     return Response.failure(error = AuthException(ApiException(AuthExceptionMsg.ALL_IS_EMPTY.msg)))
@@ -74,6 +74,8 @@ enum class AuthExceptionMsg(val msg: String) {
         }
     }
 }
+
+fun AuthExceptionMsg.asAuthException() = AuthException(ApiException(msg))
 
 /**
  * Исключение невалидного токена.
