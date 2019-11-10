@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import java.util.*
 
 buildscript {
@@ -9,11 +8,11 @@ buildscript {
         maven(url = "https://jitpack.io")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.5.1")
+        classpath("com.android.tools.build:gradle:3.5.2")
         classpath(
             kotlin(
                 module = "gradle-plugin",
-                version = "1.3.50"
+                version = Application.gradle
             )
         )//добавить версию в отдельном файле
     }
@@ -26,13 +25,9 @@ allprojects {
         mavenCentral()
         maven(url = "https://jitpack.io")
     }
-
-    val local = Properties()
-    val localProperties: File = rootProject.file("local.properties")
-    if (localProperties.exists()) {
-        localProperties.inputStream().use { local.load(it) }
-    }
 }
+
+
 
 task<Delete>(name = "clean") {
     delete(rootProject.buildDir)

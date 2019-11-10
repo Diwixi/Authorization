@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.config.AnalysisFlags.experimental
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import java.util.*
 
 plugins {
     id("com.android.application")
@@ -9,146 +9,168 @@ plugins {
 }
 
 android {
-//    val versionMajor = Integer.parseInt(property("version_major"))
-//    val versionMinor = Integer.parseInt(version_minor)
-//    val versionPatch = Integer.parseInt(version_patch)
-//    val versionBuild = Integer.parseInt(version_build)
+    val versionMajor = property("version_major").toString().toInt()
+    val versionMinor = property("version_minor").toString().toInt()
+    val versionPatch = property("version_patch").toString().toInt()
+    val versionBuild = property("version_build").toString().toInt()
 
-    compileSdkVersion(28)
+    compileSdkVersion(Application.targetSdk)
 
     defaultConfig {
-        applicationId = "com.diwixis.mangareader"
-        minSdkVersion(24)
-        targetSdkVersion(28)
+        applicationId = Application.id
+        minSdkVersion(Application.minSdk)
+        targetSdkVersion(Application.targetSdk)
         multiDexEnabled = true
 
-//        versionCode = versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
-//        versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
+        versionCode = versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
 
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
 
+    fun getPropertyByName(propertyName: String): String {
+        val local = Properties()
+        val localProperties: File = rootProject.file("local.properties")
+        if (!localProperties.exists()) return ""
+        localProperties.inputStream().use { local.load(it) }
+        return local.getProperty(propertyName)
+    }
+
     buildTypes {
+        val userLogin = getPropertyByName("project.userLogin")
+        val userPassword = getPropertyByName("project.userPassword")
+        val clientId = getPropertyByName("project.clientId")
+        val clientSecret = getPropertyByName("project.clientSecret")
+        val apiBaseUrl = "https://kitsu.io/api/"
+
         getByName("debug") {
-//            val userLogin = getStringFromProperty("local.properties", "project.userLogin") ?: ""
-//            val userPassword =
-//                getStringFromProperty("local.properties", "project.userPassword") ?: ""
-//            val clientId = getStringFromProperty("local.properties", "project.clientId") ?: ""
-//            val clientSecret =
-//                getStringFromProperty("local.properties", "project.clientSecret") ?: ""
+            buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+            buildConfigField("String", "DEV_USER_LOGIN", "\"$userLogin\"")
+            buildConfigField("String", "DEV_USER_PASSWORD", "\"$userPassword\"")
+            buildConfigField("String", "CLIENT_ID", "\"$clientId\"")
+            buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
 
-//            isDebugable = true //дебаг
-//            isMinifyEnabled = false //удаление неиспользуемого кода
-//            isShrinkResources = false //удаление неиспользованных ресурсов
-//            buildConfigField "String", "API_BASE_URL", '"https://kitsu.io/api/"'
-//            buildConfigField "String", "DEV_USER_LOGIN", "\"$userLogin\""
-//            buildConfigField "String", "DEV_USER_PASSWORD", "\"$userPassword\""
-//            buildConfigField "String", "CLIENT_ID", "\"$clientId\""
-//            buildConfigField "String", "CLIENT_SECRET", "\"$clientSecret\""
+            isDebuggable = true //дебаг
+            isMinifyEnabled = false //удаление неиспользуемого кода
+            isShrinkResources = false //удаление неиспользованных ресурсов
         }
-        getByName("release"){
-//            def clientId = getStringFromProperty ("local.properties", "project.clientId") ?: ""
-//            def clientSecret = getStringFromProperty ("local.properties", "project.clientSecret") ?: ""
+        getByName("release") {
+            buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+            buildConfigField("String", "DEV_USER_LOGIN", "\" \"")
+            buildConfigField("String", "DEV_USER_PASSWORD", "\" \"")
+            buildConfigField("String", "CLIENT_ID", "\"$clientId\"")
+            buildConfigField("String", "CLIENT_SECRET", "\"$clientSecret\"")
 
-//            isDebugable = true
-//            isMinifyEnabled = false
-//            isShrinkResources = false
-//            proguardFiles getDefaultProguardFile ('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//            buildConfigField "String", "API_BASE_URL", '"https://kitsu.io/api/"'
-//            buildConfigField "String", "DEV_USER_LOGIN", '"'
-//            buildConfigField "String", "DEV_USER_PASSWORD", '""'
-//            buildConfigField "String", "CLIENT_ID", "\"$clientId\""
-//            buildConfigField "String", "CLIENT_SECRET", "\"$clientSecret\""
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            setProguardFiles(
+                listOf(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            )
         }
     }
 
-//    dexOptions {
-//        isPreDexLibraries = true
-//        maxProcessCount(4)
-//        javaMaxHeapSize = "8g"
-//        isJumboMode = true
-//    }
-//
-//    lintOptions {
-//        isAbortOnError = true
-//        isCheckReleaseBuilds = true
-//        isNoLines = true
-//        isXmlReport = false
-//    }
+    dexOptions {
+        preDexLibraries = true
+        maxProcessCount = 4
+        javaMaxHeapSize = "8g"
+        jumboMode = true
+    }
 
-//    androidExtensions { experimental = true }
+    lintOptions {
+        isAbortOnError = true
+        isCheckReleaseBuilds = true
+        isNoLines = true
+        xmlReport = false
+    }
 
-//    applicationVariants.all { variant ->
-//        def flavor = variant . productFlavors [0]
-//        def buildType = variant . buildType
-//
-//                File outDir = file ("${rootDir}/out/${buildType.name}")
-//        File mappingOutDir = file ("${outDir}/mapping")
-//        if (!outDir.exists()) {
-//            outDir.mkdirs()
-//        }
-//        if (!mappingOutDir.exists()) {
-//            mappingOutDir.mkdirs()
-//        }
-//        variant.assemble.doLast {
-//            variant.outputs.each { output ->
-//                copy {
-//                    from output . outputFile
-//                            into outDir
-//                            rename { fileName -> "MangaReader-v${variant.versionName}.apk" }
-//                }
-//            }
-//        }
-//    }
+    androidExtensions { isExperimental = true }
+
+    //TODO Починить. Не работает Т_Т
+    applicationVariants.all { variant ->
+        val flavor = variant.productFlavors[0]
+        val buildType = variant.buildType
+
+        val outDir = file("${rootDir}/out/${buildType.name}")
+        val mappingOutDir = file("${outDir}/mapping")
+        if (!outDir.exists()) {
+            outDir.mkdirs()
+        }
+        if (!mappingOutDir.exists()) {
+            mappingOutDir.mkdirs()
+        }
+
+        println("variant: $variant")
+        variant.assembleProvider?.get()?.doLast {
+            variant.outputs.all { output ->
+                val outputImpl = output as BaseVariantOutputImpl
+                val fileName = output.outputFileName
+                    .replace(
+                        "-release",
+                        "-release-MangaReader-v${variant.versionName}.apk"
+                    )
+                    .replace(
+                        "-debug",
+                        "-debug-MangaReader-v${variant.versionName}.apk"
+                    )
+                println("output file name: $fileName")
+                outputImpl.outputFileName = fileName
+                true
+            }
+        }
+        true
+    }
 }
 
 dependencies {
-//    implementation fileTree (org.gradle.internal.impldep.bsh.commands.dir: 'libs', include: ['*.jar'])
-    implementation("com.android.support:multidex:1.0.3")
-
     //COROUTINES
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.1")
+    implementation(Coroutines.core)
+    implementation(Coroutines.android)
 
     // RETROFIT
-    implementation("com.squareup.okhttp3:logging-interceptor:4.2.0")
-    implementation("com.squareup.retrofit2:retrofit:2.6.1")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+    implementation(Retrofit.loggingInterceptor)
+    implementation(Retrofit.retrofit)
+    implementation(Retrofit.coroutinesAdapter)
+    implementation(Retrofit.converter)
 
     // KOIN
-    implementation("org.koin:koin-core:2.0.1")
-    implementation("org.koin:koin-androidx-viewmodel:2.0.1")
+    implementation(Koin.core)
+    implementation(Koin.viewModel)
 
     // IMAGE
-    implementation("io.coil-kt:coil:0.7.0")
+    implementation(Image.coil)
 
     // LOGGER
-    implementation("com.jakewharton.timber:timber:4.7.1")
-    debugImplementation("com.github.ChuckerTeam.Chucker:library:3.0.1")
-    releaseImplementation("com.github.ChuckerTeam.Chucker:library-no-op:3.0.1")
+    implementation(Logger.timber)
+    debugImplementation(Logger.chucker)
+    releaseImplementation(Logger.chuckerNoOp)
 
     //JSON
-    api("com.fasterxml.jackson.core:jackson-databind:2.10.0.pr3")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.0.pr3")
+    api(Json.jacksonDatabind)
+    implementation(Json.jacksonKotlin)
 
     //LIFECYCLE
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-alpha04")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0-alpha04")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-alpha04")
+    implementation(Lifecycle.viewModel)
+    implementation(Lifecycle.runtimeKtx)
+    implementation(Lifecycle.livedata)
+    implementation(Lifecycle.extensions)
+    implementation(Lifecycle.runtime)
+    implementation(Lifecycle.common)
+    kapt(Lifecycle.livecycleCompiler)
 
     //ANDROIDX
-    implementation("com.google.android.material:material:1.0.0")
-    implementation("androidx.annotation:annotation:1.1.0")
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-    implementation("androidx.lifecycle:lifecycle-extensions:2.1.0")
-    implementation("androidx.lifecycle:lifecycle-runtime:2.1.0")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.1.0")
-    implementation("androidx.room:room-runtime:2.1.0")
-    kapt("androidx.lifecycle:lifecycle-compiler:2.1.0")
-    kapt("androidx.room:room-compiler:2.1.0")
+    implementation(AndroidX.material)
+    implementation(AndroidX.annotation)
+    implementation(AndroidX.constraintLayout)
+    implementation(Room.core)
+    kapt(Room.compiler)
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.50")
-    testImplementation("junit:junit:4.12")
+    implementation(Android.jdk)
+    implementation(Android.multidex)
+    testImplementation(Android.junit)
 }
 
-//kapt { generateStubs = true }
+kapt { generateStubs = true }
