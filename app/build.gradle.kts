@@ -107,15 +107,13 @@ android {
         variant.assembleProvider?.get()?.doLast {
             variant.outputs.all { output ->
                 val outputImpl = output as BaseVariantOutputImpl
-                val fileName = output.outputFileName
-                    .replace(
-                        "-release",
-                        "-release-MangaReader-v${variant.versionName}.apk"
-                    )
-                    .replace(
-                        "-debug",
-                        "-debug-MangaReader-v${variant.versionName}.apk"
-                    )
+                val fileName = output.outputFileName.replace(
+                    "-release",
+                    "-release-MangaReader-v${variant.versionName}.apk"
+                ).replace(
+                    "-debug",
+                    "-debug-MangaReader-v${variant.versionName}.apk"
+                )
                 println("output file name: $fileName")
                 outputImpl.outputFileName = fileName
                 true
