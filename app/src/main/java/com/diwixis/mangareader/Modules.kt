@@ -4,7 +4,7 @@ import com.diwixis.mangareader.data.local.Preferences
 import com.diwixis.mangareader.data.remote.*
 import com.diwixis.mangareader.data.remote.api.AuthApi
 import com.diwixis.mangareader.data.repository.AuthRepositoryImpl
-import com.diwixis.mangareader.domain.repository.AuthRepository
+import com.diwixis.auth.repository.AuthRepository
 import com.diwixis.mangareader.domain.usecase.AuthUseCase
 import com.diwixis.mangareader.domain.usecase.AuthUseCaseImpl
 import com.diwixis.mangareader.presentation.screens.authorization.AuthorizationViewModel
@@ -24,15 +24,21 @@ val modules = module {
 
 val authModule = module {
     single<AuthUseCase> { AuthUseCaseImpl(get(), get()) }
-    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
+    single<com.diwixis.auth.repository.AuthRepository> { AuthRepositoryImpl(get(), get()) }
     single { AuthDataFactory(get()) }
     factory { (service: AuthService) -> AuthApi(service) }
 }
 
 val networkModule = module {
-    single { ApiSource(get(), get()) }
-    single { HttpClientFactory(get()) }
-    single { HttpClient(get(), BuildConfig.API_BASE_URL, BuildConfig.DEBUG) }
+    single { com.diwixis.core.remote.ApiSource(get(), get()) }
+    single { com.diwixis.core.remote.HttpClientFactory(get()) }
+    single {
+        com.diwixis.core.remote.HttpClient(
+            get(),
+            BuildConfig.API_BASE_URL,
+            BuildConfig.DEBUG
+        )
+    }
 }
 
 val viewModels = module {

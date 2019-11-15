@@ -7,6 +7,8 @@ object Application {
 
 object Module {
     val app = ":app"
+    val auth = ":auth"
+    val core = ":core"
 }
 
 private const val coroutinesVersion = "1.3.1"

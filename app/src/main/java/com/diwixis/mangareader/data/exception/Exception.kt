@@ -6,24 +6,6 @@ import com.diwixis.mangareader.presentation.common.Response
 import com.diwixis.mangareader.utils.extensions.loginIsValid
 import com.diwixis.mangareader.utils.extensions.passwordIsValid
 
-/**
- * Исключение API запроса.
- *
- * @author П. Густокашин (Diwixis)
- */
-open class ApiException(
-    override val message: String? = null,
-    override val cause: Throwable? = null,
-    val errorWrapper: ErrorWrapper? = null
-) : RuntimeException() {
-
-    constructor(exception: ApiException) : this(
-        message = exception.message,
-        cause = exception.cause,
-        errorWrapper = exception.errorWrapper
-    )
-}
-
 class AuthException(exception: ApiException) : ApiException(exception) {
     companion object {
         fun checkFields(login: String, pass: String): Response<AuthException>? {
